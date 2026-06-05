@@ -205,13 +205,17 @@
   /* ---------- MOBILE / PHONE ---------- */
   @media (max-width:640px){
     .hero{flex-direction:column}
-    /* video breathes up top; text/form sit in the darker lower band */
+    /* keep BOTH mugs (lower-right of the frame) in shot on a tall portrait screen */
+    .hero video{object-position:74% 52%}
+    /* lighter, warm scrim — mugs + steam stay visible behind the text,
+       with just enough grounding at the very bottom for the form */
     .hero::after{
       background:linear-gradient(180deg,
-        rgba(20,14,11,.40) 0%,
-        rgba(20,14,11,.28) 32%,
-        rgba(20,14,11,.62) 66%,
-        rgba(20,14,11,.85) 100%);
+        rgba(20,14,11,.22) 0%,
+        rgba(20,14,11,.08) 30%,
+        rgba(20,14,11,.34) 58%,
+        rgba(20,14,11,.72) 86%,
+        rgba(20,14,11,.86) 100%);
     }
     .inner{
       flex:1 1 auto;
@@ -224,9 +228,14 @@
     }
     .content{max-width:100%}
     .brand{margin-bottom:18px}
-    h1{font-size:clamp(2.1rem,8.8vw,3rem);margin-bottom:16px}
-    .lede{font-size:1.04rem}
-    .story{font-size:.96rem;margin-bottom:24px}
+    /* stronger shadows so white text reads over the now-visible mugs */
+    h1{
+      font-size:clamp(2.1rem,8.8vw,3rem);margin-bottom:16px;
+      text-shadow:0 2px 24px rgba(0,0,0,.65),0 1px 3px rgba(0,0,0,.55);
+    }
+    .lede{font-size:1.04rem;text-shadow:0 1px 16px rgba(0,0,0,.7)}
+    .story{font-size:.96rem;margin-bottom:24px;text-shadow:0 1px 16px rgba(0,0,0,.7)}
+    .brand{text-shadow:0 1px 12px rgba(0,0,0,.6)}
     .fields,button,.fineprint,.success{max-width:100%}
     .foot{
       position:relative;
