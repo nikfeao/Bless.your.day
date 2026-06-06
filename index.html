@@ -172,6 +172,7 @@
   .fineprint{font-size:.82rem;color:rgba(251,246,238,.6);margin-top:14px;max-width:400px}
   .err{display:none;color:var(--gold);font-size:.88rem;margin-top:10px}
   .err.show{display:block}
+  .err a{color:#fff;text-decoration:underline;font-weight:600;cursor:pointer}
 
   /* ---------- SUCCESS ---------- */
   .success{
@@ -183,7 +184,7 @@
     animation:rise .6s ease both;
   }
   .success.show{display:block}
-  .success .tick{font-size:3.2rem;line-height:1;margin-bottom:12px}
+  .success .tick{font-size:2rem;line-height:1;margin-bottom:12px}
   .success h2{font-family:'Fraunces',serif;font-weight:500;font-size:1.5rem;margin:12px 0 8px}
   .success p{color:var(--espresso-soft);font-size:1rem}
 
@@ -203,8 +204,9 @@
   .mum{
     display:inline-block;
     height:.95em;width:auto;
-    color:var(--espresso);
-    vertical-align:middle;
+    color:var(--gold);
+    vertical-align:-.16em;
+    margin-left:8px;
   }
 
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -289,7 +291,7 @@
 
         <!-- SUCCESS -->
         <div class="success" id="success">
-          <div class="tick" aria-hidden="true"><svg class="mum" viewBox="0 -10 100 102" role="img" aria-label="Mum's signature smiley"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M52 7 C72 7 88 24 88 46 C88 68 72 85 48 85 C28 85 12 70 10 49 C9 33 30 7 52 7 Z"/><path d="M40 40 C41 44 45 44 46 40"/><path d="M54 42 L60.5 43.2"/><path d="M40 60 C47 63.4 55 63.4 62 59.8"/><path d="M47 7 C45 4 49 3 47 0 C45 -2 49 -3 47 -6"/><path d="M58 7 C56 4 60 3 58 0 C56 -2 60 -3 58 -6"/></g></svg></div>
+          <div class="tick" aria-hidden="true"><span class="xoxo">xoxo</span><svg class="mum" viewBox="0 -10 100 102" role="img" aria-label="Mum's signature smiley"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M52 7 C72 7 88 24 88 46 C88 68 72 85 48 85 C28 85 12 70 10 49 C9 33 30 7 52 7 Z"/><path d="M40 40 C41 44 45 44 46 40"/><path d="M54 42 L60.5 43.2"/><path d="M40 60 C47 63.4 55 63.4 62 59.8"/><path d="M47 7 C45 4 49 3 47 0 C45 -2 49 -3 47 -6"/><path d="M58 7 C56 4 60 3 58 0 C56 -2 60 -3 58 -6"/></g></svg></div>
           <h2>Thanks for signing up!</h2>
           <p>We look forward to updating you.<br><strong>Bless Your Day!</strong> ☕</p>
         </div>
@@ -311,14 +313,70 @@
   const errMsg = document.getElementById('errMsg');
   const success = document.getElementById('success');
 
+  // Popular providers we'll gently spell-check the domain against
+  const COMMON_DOMAINS = [
+    'gmail.com','googlemail.com','outlook.com','hotmail.com','live.com','msn.com',
+    'yahoo.com','yahoo.com.au','ymail.com','icloud.com','me.com','mac.com',
+    'bigpond.com','bigpond.net.au','optusnet.com.au','iinet.net.au','protonmail.com','proton.me'
+  ];
+
+  function validFormat(e){
+    // something@something.tld  (tld 2+ chars, no spaces)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+  }
+  function lev(a,b){
+    const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);
+    for(let j=0;j<=n;j++) d[0][j]=j;
+    for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+      d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+    return d[m][n];
+  }
+  function suggestDomain(dom){
+    if(COMMON_DOMAINS.includes(dom)) return null;
+    let best=null,bestD=99;
+    for(const d of COMMON_DOMAINS){ const dist=lev(dom,d); if(dist<bestD){bestD=dist;best=d;} }
+    return (best && bestD>0 && bestD<=2) ? best : null;
+  }
+  function showErr(html){ errMsg.innerHTML=html; errMsg.classList.add('show'); }
+  function clearErr(){ errMsg.classList.remove('show'); }
+
+  let allowTypo=false; // set true after we've warned, so a 2nd submit can send as-is
+  // any edit to the email resets the typo override and clears the message
+  form.email.addEventListener('input',()=>{ allowTypo=false; clearErr(); });
+
   form.addEventListener('submit', async function(e){
     e.preventDefault();
-    errMsg.classList.remove('show');
+    clearErr();
     if (form.company.value){ form.style.display='none'; success.classList.add('show'); return; }
 
     const name = form.name.value.trim();
     const email = form.email.value.trim();
-    if(!name || !email){ return; }
+    if(!name){ return; }
+
+    // 1) basic format
+    if(!validFormat(email)){
+      showErr("Hmm, that email doesn’t look quite right. Mind checking the format?");
+      return;
+    }
+    // 2) common-domain typo (e.g. gmai.com → gmail.com)
+    const at = email.lastIndexOf('@');
+    const local = email.slice(0,at);
+    const dom = email.slice(at+1).toLowerCase();
+    if(!allowTypo){
+      const sugg = suggestDomain(dom);
+      if(sugg){
+        showErr('Did you mean <a href="#" id="fixEmail">'+local+'@'+sugg+'</a>? Or tap “Join the waitlist” again to send it as is.');
+        allowTypo=true;
+        const fix=document.getElementById('fixEmail');
+        if(fix) fix.addEventListener('click',function(ev){
+          ev.preventDefault();
+          form.email.value=local+'@'+sugg;
+          clearErr(); allowTypo=false;
+          (form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit',{cancelable:true})));
+        });
+        return;
+      }
+    }
 
     btn.disabled = true; btn.textContent = 'Saving your spot…';
     try{
@@ -334,7 +392,7 @@
       form.style.display='none'; success.classList.add('show');
     }catch(err){
       btn.disabled=false; btn.textContent='Join the waitlist';
-      errMsg.classList.add('show');
+      showErr("Hmm, something went wrong. Mind trying again?");
     }
   });
 </script>
