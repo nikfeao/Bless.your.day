@@ -396,5 +396,52 @@
     }
   });
 </script>
+
+<script>
+  // ============================================================
+  //  BACKGROUND VIDEO — keep it playing & looping
+  //  Markup already has autoplay/muted/loop/playsinline, but
+  //  browsers can still refuse or pause autoplay (Low Power Mode,
+  //  data-saver, tab opened in the background, etc). This nudges
+  //  it back to life without ever showing controls.
+  // ============================================================
+  (function(){
+    const v = document.querySelector('.hero video');
+    if(!v) return;
+
+    // Muting via the property (not just the attribute) is what
+    // actually unlocks autoplay on iOS/Safari.
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted','');
+    v.playsInline = true;
+
+    function kick(){
+      const p = v.play();
+      if(p && typeof p.catch === 'function'){ p.catch(()=>{}); }
+    }
+
+    // Try as soon as there's something to show, and again once loaded.
+    v.addEventListener('loadeddata', kick);
+    v.addEventListener('canplay', kick);
+    if(v.readyState >= 2) kick();
+
+    // Belt-and-suspenders loop: if it ever ends despite the loop
+    // attribute, restart it.
+    v.addEventListener('ended', function(){ v.currentTime = 0; kick(); });
+
+    // If autoplay was blocked, the first user interaction frees it.
+    const onGesture = function(){ kick(); };
+    ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){
+      window.addEventListener(ev, onGesture, { once:true, passive:true });
+    });
+
+    // Resume when the tab/window regains focus.
+    document.addEventListener('visibilitychange', function(){
+      if(!document.hidden && v.paused) kick();
+    });
+    window.addEventListener('pageshow', kick);
+  })();
+</script>
 </body>
 </html>
