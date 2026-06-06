@@ -198,6 +198,14 @@
     color:rgba(251,246,238,.6);
   }
   .foot .xoxo{font-family:'Fraunces',serif;font-style:italic;color:var(--gold);font-size:.95rem}
+  /* Mum's hand-drawn smiley signature — traced from her card sign-off */
+  .foot .mum{
+    display:inline-block;
+    height:1.85em;width:auto;
+    color:var(--gold);
+    vertical-align:-.62em;
+    margin-left:3px;
+  }
 
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important}body *{opacity:1!important}}
@@ -258,9 +266,7 @@
 
     <div class="inner">
       <div class="content">
-        <div class="brand">Bless Your Day</div>
-
-        <h1>Every day deserves<br>a <em>blessing</em>.</h1>
+        <h1><em>Clink, Clink</em><br>Bless your day!</h1>
 
         <p class="lede">It started with two coffee mugs, a gentle clink, and three quiet words — <em>“bless your day.”</em></p>
         <p class="story">A family morning ritual, now poured into something you can hold. We’re launching soon — be the first to know.</p>
@@ -283,14 +289,24 @@
 
         <!-- SUCCESS -->
         <div class="success" id="success">
-          <div class="tick" aria-hidden="true">🤍</div>
-          <h2>You’re on the list.</h2>
-          <p>Thank you — truly. We’ll be in touch the moment we launch. Until then, go bless someone’s day.</p>
+          <div class="tick" aria-hidden="true">☕</div>
+          <h2>Thanks for signing up!</h2>
+          <p>We look forward to updating you.<br>— <strong>Bless Your Day!</strong> ☕</p>
         </div>
       </div>
     </div>
 
-    <div class="foot">Made with love in Australia &nbsp;·&nbsp; <span class="xoxo">xoxo</span></div>
+    <div class="foot">Psalm 118:24 &nbsp;·&nbsp; <svg class="mum" viewBox="0 0 100 92" role="img" aria-label="Mum's signature smiley">
+      <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <!-- face outline (slightly egg-shaped, soft point on the left) -->
+        <path d="M52 7 C72 7 88 24 88 46 C88 68 72 85 48 85 C28 85 12 70 10 49 C9 33 30 7 52 7 Z"/>
+        <!-- eyes -->
+        <path d="M42 38 C41 41 42 44 44 45"/>
+        <path d="M55 39 L60.5 43"/>
+        <!-- smile -->
+        <path d="M40 59 C46 65 55 65 62 58"/>
+      </g>
+    </svg></div>
   </section>
 
 <script>
