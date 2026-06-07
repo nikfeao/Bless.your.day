@@ -109,6 +109,8 @@
     opacity:0;animation:rise .9s .2s ease both;
   }
   h1 em{font-style:italic;color:var(--gold)}
+  /* keep this phrase from breaking across two lines on narrow screens */
+  .nowrap{white-space:nowrap}
 
   .lede{
     font-size:clamp(1.04rem,2.4vw,1.22rem);
@@ -270,7 +272,7 @@
       <div class="content">
         <h1><em>Clink, Clink</em><br>Bless your day!</h1>
 
-        <p class="lede">It started with two coffee mugs, a gentle clink, and three quiet words. <em>“Bless your day.”</em></p>
+        <p class="lede">It started with two coffee mugs, a gentle clink, and three quiet words. <em class="nowrap">“Bless your day.”</em></p>
         <p class="story">A family morning ritual, now poured into something you can hold. We’re launching soon. Be the first to know.</p>
 
         <!-- FORM -->
